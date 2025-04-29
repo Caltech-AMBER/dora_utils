@@ -35,6 +35,7 @@ dev = [
 ]
 
 [tool.ruff]
+line-length = 120
 lint.select = [
     "E",  # pycodestyle errors.
     "F",  # Pyflakes rules.
@@ -42,10 +43,10 @@ lint.select = [
     "PLE",  # Pylint errors.
     "PLR",  # Pylint refactor recommendations.
     "PLW",  # Pylint warnings.
-    "I", # Import sorting.
+    "I",  # Import sorting.
 ]
 lint.ignore = [
-    "E741", # Ambiguous variable name. (l, O, or I)
+    "E741",  # Ambiguous variable name. (l, O, or I)
     "E501",  # Line too long.
     "E721",  # Do not compare types, use `isinstance()`.
     "F722",  # Forward annotation false positive from jaxtyping. Should be caught by pyright.

@@ -6,11 +6,7 @@ from typing import Callable, Sequence
 from dora import Node
 
 
-def on_event(
-    event_type: str,
-    event_id: str | Sequence[str] | set[str] | None,
-    run_async: bool = False,
-) -> Callable:
+def on_event(event_type: str, event_id: str | Sequence[str] | set[str] | None, run_async: bool = False) -> Callable:
     """Decorator to mark a method as an event handler.
 
     Args:
@@ -34,9 +30,7 @@ def on_event(
 class DoraNode:
     """Convenience wrapper for a `dora-rs` Node that cleans up event handling."""
 
-    def __init__(
-        self, node_id: str | None = None, max_workers: int | None = None
-    ) -> None:
+    def __init__(self, node_id: str | None = None, max_workers: int | None = None) -> None:
         """Initialize the DoraNode.
 
         Args:
@@ -48,9 +42,7 @@ class DoraNode:
         if max_workers is None:
             self.executor = None  # no async callbacks
         else:
-            self.executor = ThreadPoolExecutor(
-                max_workers=max_workers
-            )  # thread pool for async callbacks
+            self.executor = ThreadPoolExecutor(max_workers=max_workers)  # thread pool for async callbacks
         self._register_event_handlers()
 
     def cleanup(self) -> None:
