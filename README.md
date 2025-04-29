@@ -105,3 +105,29 @@ I heard override from speech
 I heard override from speech
 I heard override from speech
 ```
+
+When you import the `dora_utils` package to your own project, you can use the `hydra` configuration design pattern as in our `scripts/run.py` file:
+```
+from pathlib import Path
+
+import hydra
+from omegaconf import DictConfig
+
+from dora_utils.launch.run import run
+
+CONFIG_PATH = Path(__file__).parent / "configs"
+
+
+@hydra.main(config_path=str(CONFIG_PATH), config_name="default", version_base="1.3")
+def main(cfg: DictConfig) -> None:
+    """Main function to run a dora stack via a hydra configuration yaml file."""
+    run(cfg)
+
+
+if __name__ == "__main__":
+    main()
+```
+The main variables to change in your downstream project are the configuration path and configuration name. Note that these can easily be overwritten from the command line, e.g., as follows:
+```bash
+python scripts/run.py -cp <my_config_path> -cn <my_config_name>
+```
