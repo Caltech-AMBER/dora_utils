@@ -16,5 +16,8 @@ dataflow:
 node_definitions:
   - _target_: dora_utils.examples.chatter.talker.Talker
     node_id: talker
+    max_workers: null
   - _target_: dora_utils.examples.chatter.listener.Listener
     node_id: listener
+    max_workers: null
+    override_msg: null
