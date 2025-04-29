@@ -1,6 +1,8 @@
 # Dora Utils
 This repository contains some simple utilities for using [`dora`](https://github.com/dora-rs/dora) that improve QoL.
 
+For simple usage examples, see `dora_utils.examples`.
+
 ## The `DoraNode` class
 The usual workflow in `dora` is to define a `Node`, which acts as an iterator over events. In this loop, you can then manually handle the events as they arrive in the node. We provide a convenient `DoraNode` convenience class to register callbacks on events in a more ROS-style fashion. Consider the `talker.py` and `listener.py` examples:
 ```
