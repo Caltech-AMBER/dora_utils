@@ -1,6 +1,6 @@
 import json
 from dataclasses import asdict
-from typing import TYPE_CHECKING, Any, Type
+from typing import TYPE_CHECKING, Any, Type, Union
 
 import numpy as np
 import pyarrow as pa
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from _typeshed import DataclassInstance
 
 
-def to_arrow(obj: DataclassInstance | dict) -> tuple[pa.Array, dict]:
+def to_arrow(obj: Union["DataclassInstance", dict]) -> tuple[pa.Array, dict]:
     """Convert a dataclass or dict to a pyarrow array and metadata."""
     raw = obj if isinstance(obj, dict) else asdict(obj)
     numpy_paths: list[str] = []
