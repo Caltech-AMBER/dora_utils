@@ -28,7 +28,7 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["dora_utils"]
+include = ["dora_utils*"]
 
 [project.optional-dependencies]
 dev = [
