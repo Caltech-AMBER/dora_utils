@@ -14,10 +14,12 @@ dataflow:
 
 # everything else is used to instantiate and spin the nodes with hydra
 node_definitions:
-  - _target_: dora_utils.examples.chatter.talker.Talker
+  talker:
+    _target_: dora_utils.examples.chatter.talker.Talker
     node_id: talker
     max_workers: null
-  - _target_: dora_utils.examples.chatter.listener.Listener
+  listener:
+    _target_: dora_utils.examples.chatter.listener.Listener
     node_id: listener
     max_workers: null
     override_msg: null

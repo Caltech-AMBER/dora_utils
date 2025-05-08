@@ -28,7 +28,7 @@ def run(cfg: DictConfig) -> None:
     process = subprocess.Popen(f"dora up && dora start {dataflow_path}", shell=True)
 
     yaml_paths = []
-    for node_cfg in cfg.node_definitions:
+    for node_cfg in cfg.node_definitions.values():
         node_name = f"tmp_{node_cfg.node_id}"
         yaml_path = write_tmp(node_cfg, tmp_dir, node_name)
         subprocess.Popen(f"python {Path(__file__).parent}/_launch_node.py -cp {tmp_dir} -cn {node_name}", shell=True)

@@ -67,15 +67,18 @@ dataflow:
 
 # everything else is used to instantiate and spin the nodes with hydra
 node_definitions:
-  - _target_: dora_utils.examples.chatter.talker.Talker
+  talker:  # <--- this name doesn't matter
+    _target_: dora_utils.examples.chatter.talker.Talker
     node_id: talker
     max_workers: null
-  - _target_: dora_utils.examples.chatter.listener.Listener
+  listener:  # <--- this name doesn't matter
+    _target_: dora_utils.examples.chatter.listener.Listener
     node_id: listener
     max_workers: null
     override_msg: null
+
 ```
-Everything under the `dataflow` section is the "standard" `dora` dataflow, which defines the nodes, their IDs, their inputs/outputs, etc. Under `node_definitions` is a list of `hydra` targets, so you can instantiate arbitrarily complicated nodes using `hydra`'s composition API.
+Everything under the `dataflow` section is the "standard" `dora` dataflow, which defines the nodes, their IDs, their inputs/outputs, etc. Under `node_definitions` is a list of `hydra` targets, so you can instantiate arbitrarily complicated nodes using `hydra`'s composition API. Above, you'll see that there are comments saying "this name doesn't matter." We use this yaml syntax because we want to be able to use `hydra`'s configuration override syntax to preserve default values. Because lists are atomic in `hydra`, we can't override single list elements, so in any file that specifies another configuration file as a default, we would have to copy and paste the entire `node_definitions` section. When we instead structure things like a dictionary, overrides work!
 
 If we run
 ```bash
@@ -91,10 +94,12 @@ I heard Hello World from speech
 Now, if we modify `chatter.yaml` to instead show
 ```
 node_definitions:
-  - _target_: dora_utils.examples.chatter.talker.Talker
+  talker:
+    _target_: dora_utils.examples.chatter.talker.Talker
     node_id: talker
     max_workers: null
-  - _target_: dora_utils.examples.chatter.listener.Listener
+  listener:
+    _target_: dora_utils.examples.chatter.listener.Listener
     node_id: listener
     max_workers: null
     override_msg: "override"  # change this field for this example!
