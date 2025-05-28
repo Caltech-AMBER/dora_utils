@@ -29,6 +29,10 @@ def run(cfg: DictConfig) -> None:
 
     yaml_paths = []
     for node_cfg in cfg.node_definitions.values():
+        # allow skipping of node definitions by setting to null when overriding configs
+        if node_cfg is None:
+            continue
+
         node_name = f"tmp_{node_cfg.node_id}"
         yaml_path = write_tmp(node_cfg, tmp_dir, node_name)
         subprocess.Popen(f"python {Path(__file__).parent}/_launch_node.py -cp {tmp_dir} -cn {node_name}", shell=True)
