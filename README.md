@@ -1,6 +1,11 @@
 # Dora Utils
 This repository contains some simple utilities for using [`dora`](https://github.com/dora-rs/dora) that improve QoL.
 
+To install, run
+```bash
+pip install dora-utils
+```
+
 For simple usage examples, see `dora_utils.examples`.
 
 ## The `DoraNode` class
