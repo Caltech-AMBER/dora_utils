@@ -1,6 +1,9 @@
 import atexit
+import os
 import shutil
+import signal
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -25,9 +28,10 @@ def run(cfg: DictConfig) -> None:
     # there were strange interactions when trying to spin the nodes by manually calling spin with threading or mp, but
     # this workaround seems to work with dynamic nodes.
     dataflow_path = write_tmp(cfg.dataflow, tmp_dir, "tmp_dataflow")
-    process = subprocess.Popen(f"dora up && dora start {dataflow_path}", shell=True)
+    dora = subprocess.Popen(f"dora up && dora start {dataflow_path}", shell=True, start_new_session=True)
 
     yaml_paths = []
+    node_processes = []
     for node_cfg in cfg.node_definitions.values():
         # allow skipping of node definitions by setting to null when overriding configs
         if node_cfg is None:
@@ -35,17 +39,48 @@ def run(cfg: DictConfig) -> None:
 
         node_name = f"tmp_{node_cfg.node_id}"
         yaml_path = write_tmp(node_cfg, tmp_dir, node_name)
-        subprocess.Popen(f"python {Path(__file__).parent}/_launch_node.py -cp {tmp_dir} -cn {node_name}", shell=True)
+        p = subprocess.Popen(
+            f"python {Path(__file__).parent}/_launch_node.py -cp {tmp_dir} -cn {node_name}",
+            shell=True,
+            start_new_session=True,
+        )
         yaml_paths.append(yaml_path)
+        node_processes.append(p)
 
-    # register a cleanup function to remove the temp yaml files when the script exits
-    def _cleanup_tmp_dir():
-        try:
-            shutil.rmtree(tmp_dir)
-        except Exception:
-            pass
+    # register callback to tear down dora cleanly and terminate all node processes
+    cleaned = False
+    def _cleanup():
+        nonlocal cleaned
+        if cleaned:
+            return  # idempotent cleanup
+        cleaned = True
 
-    atexit.register(_cleanup_tmp_dir)
+        # tear down dora daemon and coordinator
+        subprocess.run(["dora", "destroy"], check=True)
+
+        # terminate all node processes if they are still running
+        for p in node_processes:
+            try:
+                if p.poll() is None:
+                    os.killpg(p.pid, signal.SIGINT)
+                    p.wait(timeout=5)
+            except Exception:
+                pass
+
+        # remove temporary yaml files
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    atexit.register(_cleanup)
 
     # don't terminate the script until the main dora process does
-    process.wait()
+    caught_keyboard_interrupt = False
+    try:
+        dora.wait()
+    except KeyboardInterrupt:
+        caught_keyboard_interrupt = True
+        pass
+    finally:
+        _cleanup()
+        if caught_keyboard_interrupt:
+            raise KeyboardInterrupt("Caught KeyboardInterrupt, cleaning up and exiting.")
+        sys.exit(0)
